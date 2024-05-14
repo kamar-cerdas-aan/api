@@ -1,31 +1,5 @@
 const mongoose = require('mongoose');
 
-const dataSchema = new mongoose.Schema(
-    {
-        device_id: {
-            type: String,
-            trim: true,
-            default: () => {this.parent().device_id},
-        },
-        light: {
-            type: Boolean,
-            required: true,
-        },
-        pir: {
-            type: Boolean,
-            required: true,
-        },
-        load: {
-            type: Boolean,
-            required: true,
-        },
-        override: {
-            type: Boolean,
-            required: true,
-        },
-    }, {timestamps: true}
-)
-
 const deviceSchema = new mongoose.Schema({
     name : {
         type: String,
@@ -48,7 +22,35 @@ const deviceSchema = new mongoose.Schema({
         trim: true,
         required: true,
     },
-    //data: [dataSchema]
+    data: [
+            {
+                device_id: {
+                    type: String,
+                    trim: true,
+                    default: function() { return this.parent().device_id},
+                },
+                light: {
+                    type: Boolean,
+                    required: true,
+                },
+                pir: {
+                    type: Boolean,
+                    required: true,
+                },
+                load: {
+                    type: Boolean,
+                    required: true,
+                },
+                override: {
+                    type: Boolean,
+                    required: true,
+                },
+                timestamp: {
+                    type: Date,
+                    default: Date.now
+                }
+            }
+    ]
     
 },{timestamps: true});
 

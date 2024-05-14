@@ -9,7 +9,7 @@ const login = async (req, res) => {
     try {
       const { device_id, password } = req.body;
   
-      const user = await Device.findOne({ device_id }).select('name location');
+      const user = await Device.findOne({ device_id }).select('name location password');
       if (!user || !device_id || !password) throw new Error("Invalid login");
   
       if (!bcrypt.compareSync(password, user.password))
@@ -35,7 +35,7 @@ const register = async (req, res) => {
     try {
       password = bcrypt.hashSync(req.body.password);
       console.log(password)
-      const newDevice = new Device({ "device_id": req.query.device_id, password: password });
+      const newDevice = new Device({ device_id: req.query.device_id, password: password });
       await newDevice.save();
       res.status(201).json({
         _id: newDevice._id,
@@ -62,8 +62,8 @@ const getProfile = async (req, res) => {
     const token = authorization.split(" ")[1];
   
     try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET).select('name location device_id');
-      const device = await Device.findOne({ device_id: decoded.device_id });
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const device = await Device.findOne({ device_id: decoded.device_id }).select('name location device_id');
       res
         .status(200)
         .json(device);
@@ -77,11 +77,12 @@ const setProfile = async (req, res) => {
     // Check auth header
     const { authorization } = req.headers;
     if (!authorization) return res.status(401).json({ message: "Unauthorized" });
+    const token = authorization.split(" ")[1];
 
     // Verify JWT
     let decoded = {};
 	try {
-        decoded = jwt.verify(token, process.env.JWT_SECRET).select('name location device_id');
+        decoded = jwt.verify(token, process.env.JWT_SECRET);
     } catch (e) {
         console.error(e);
         return res.status(401).json({ message: "Unauthorized" });
@@ -101,7 +102,7 @@ const setProfile = async (req, res) => {
 
     try {
         // Validate paket ID
-        const device = await Device.findById(decoded.device_id);
+        const device = await Device.findOne({device_id: decoded.device_id});
         if (!device) {
         return res.status(404).json('Device not found');
         }
@@ -129,7 +130,7 @@ const getData = async (req, res) => {
     const token = authorization.split(" ")[1];
   
     try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET).select('name location device_id');
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
       const device = await Device.findOne({ device_id: decoded.device_id }).select('data');
       res
         .status(200)
@@ -142,8 +143,11 @@ const getData = async (req, res) => {
 
 const setData = async (req, res) => {
     try {
+        const device_id = req.query.device_id
+        let data = req.body
+        data.timestamp = new Date(req.body.timestamp)
         // Validate paket ID
-        const device = await Device.findById(req.params.device_id);
+        const device = await Device.findOne({ device_id });
         if (!device) {
         return res.status(404).send('Device not found');
         }
