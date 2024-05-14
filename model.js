@@ -24,11 +24,6 @@ const deviceSchema = new mongoose.Schema({
     },
     data: [
             {
-                device_id: {
-                    type: String,
-                    trim: true,
-                    default: function() { return this.parent().device_id},
-                },
                 light: {
                     type: Boolean,
                     required: true,
