@@ -3,7 +3,7 @@ const express = require('express');
 const mongoose = require("mongoose");
 
 // Require routes
-//const userRoutes = require("./routes/user");
+const routes = require("./routes");
 
 const app = express();
 
@@ -24,7 +24,7 @@ const start = async () => {
     app.use("/api(|/).{0}$", (req, res) => {
         res.status(200).send("Aan API");
     });
-    //app.use("/api/", userRoutes)
+    app.use("/api", routes)
     app.use("*", (req, res) => {
         res.status(404).send("Aan");
     });
