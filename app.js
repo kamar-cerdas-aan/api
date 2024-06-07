@@ -1,6 +1,7 @@
 const config = require("dotenv").config();
 const express = require('express');
 const mongoose = require("mongoose");
+const cors = require("cors")
 
 // Require routes
 const routes = require("./routes");
@@ -13,6 +14,9 @@ const start = async () => {
   try {
     // Parse JSON body
     app.use(express.json());
+
+    // Enable CORS
+    app.use(cors())
 
     // Log requests to console
     app.use((req, res, next) => {
