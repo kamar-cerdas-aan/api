@@ -145,7 +145,7 @@ const setData = async (req, res) => {
     try {
         const device_id = req.query.device_id
         let data = req.body
-        data.timestamp = new Date(req.body.timestamp)
+        data.timestamp = Date.now()
         // Validate paket ID
         const device = await Device.findOne({ device_id });
         if (!device) {
